@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChatHeader } from './ChatHeader.tsx';
 import { UserText } from './UserText.tsx';
 import { BotText } from './BotText.tsx';
@@ -29,50 +29,96 @@ export function CareConnectFrame({
   const { activeLanguage, translations } = useLanguage();
   const t = translations[activeLanguage] || translations.AR;
 
-  const defaultMessages: Message[] = [
-    {
-      id: '1',
-      content: t.doctors,
-      sender: 'user',
-      timestamp: new Date(Date.now() - 300000)
-    },
-    {
-      id: '2',
-      content: t.chooseDoctor,
-      sender: 'bot',
-      timestamp: new Date(Date.now() - 240000),
-      showBookingOption: true
-    }
-  ];
-
-  const [messages, setMessages] = useState<Message[]>(initialMessages || defaultMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = (content: string) => {
-    if (content.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        content: content.trim(),
-        sender: 'user',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, newMessage]);
-      setInputValue('');
+  useEffect(() => {
+    // Set initial message when component mounts or language changes
+    setMessages([
+      {
+        id: 'init',
+        content: t.chooseDoctor, // Use translated "Choose your doctor" as initial bot message
+        sender: 'bot',
+        timestamp: new Date(),
+        showBookingOption: true
+      }
+    ]);
+  }, [t.chooseDoctor]);
+
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: content.trim(),
+      sender: 'user',
+      timestamp: new Date()
+    };
+    
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setInputValue('');
+    setIsLoading(true);
+
+    // --- AI API Call ---
+    try {
+      const apiKey = process.env.REACT_APP_AI_API_KEY; 
       
-      // Call external handler if provided
-      onSendMessage?.(content.trim());
-      
-      // Simulate bot response
-      setTimeout(() => {
+      // --- DEBUGGING: Check if the key is loaded ---
+      console.log("Using API Key:", apiKey ? "Key Loaded" : "Key NOT Loaded");
+      // --- END DEBUGGING ---
+
+      if (!apiKey) {
+        throw new Error("API key not found. Please add REACT_APP_AI_API_KEY to your .env.local file.");
+      }
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: `You are a helpful healthcare assistant for CareConnect. Your name is Dr. AI. You can provide general health information and help users find doctors. Respond in the user's language: ${activeLanguage}.` },
+            ...newMessages.map(msg => ({ 
+              role: msg.sender === 'bot' ? 'assistant' : 'user', 
+              content: msg.content 
+            }))
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI.');
+      }
+
+      const data = await response.json();
+      const aiResponseContent = data.choices[0]?.message?.content?.trim();
+
+      if (aiResponseContent) {
         const botResponse: Message = {
           id: (Date.now() + 1).toString(),
-          content: 'شكرًا لك على رسالتك. سأقوم بمراجعة استفسارك والرد عليك قريبًا. هل تحتاج إلى حجز موعد مع طبيب مختص؟',
+          content: aiResponseContent,
           sender: 'bot',
           timestamp: new Date(),
-          showBookingOption: Math.random() > 0.5
+          showBookingOption: aiResponseContent.toLowerCase().includes("book an appointment")
         };
         setMessages(prev => [...prev, botResponse]);
-      }, 1500);
+      }
+    } catch (error) {
+      console.error("AI API Error:", error);
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "Sorry, I'm having trouble connecting right now. Please try again later.",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -114,6 +160,13 @@ export function CareConnectFrame({
               )}
             </div>
           ))}
+          {isLoading && (
+            <div className="flex justify-start w-full">
+              <div className="bot-message opacity-70">
+                <p>Dr. AI is typing...</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       
@@ -123,6 +176,7 @@ export function CareConnectFrame({
         onChange={setInputValue}
         onSend={handleSendMessage}
         placeholder={t.book}
+        disabled={isLoading}
       />
     </div>
   );

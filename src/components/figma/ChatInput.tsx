@@ -6,17 +6,20 @@ interface ChatInputProps {
   onChange: (value: string) => void;
   onSend: (message: string) => void;
   placeholder?: string;
+  disabled?: boolean;
 }
 
-export function ChatInput({ value, onChange, onSend, placeholder = "اكتب رسالتك هنا..." }: ChatInputProps) {
+export function ChatInput({ value, onChange, onSend, placeholder = "اكتب رسالتك هنا...", disabled = false }: ChatInputProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (disabled) return;
     onSend(value);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      if (disabled) return;
       onSend(value);
     }
   };
@@ -27,12 +30,14 @@ export function ChatInput({ value, onChange, onSend, placeholder = "اكتب ر�
         {/* Microphone Button */}
         <button
           type="button"
+          disabled={disabled}
           className="
             flex items-center justify-center w-10 h-10
             bg-primary text-white rounded-full 
             hover:bg-[#004a8c] active:scale-95
             transition-all duration-150
             shadow-sm hover:shadow-md
+            disabled:bg-gray-300 disabled:cursor-not-allowed
           "
           aria-label="تسجيل صوتي"
         >
@@ -46,6 +51,7 @@ export function ChatInput({ value, onChange, onSend, placeholder = "اكتب ر�
             onChange={(e) => onChange(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
+            disabled={disabled}
             className="
               w-full px-4 py-3 bg-white border border-gray-200 rounded-xl 
               resize-none overflow-hidden min-h-[48px] max-h-32
@@ -53,6 +59,7 @@ export function ChatInput({ value, onChange, onSend, placeholder = "اكتب ر�
               focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
               placeholder:text-gray-400
               transition-all duration-150
+              disabled:bg-gray-200
             "
             dir="rtl"
             rows={1}
@@ -71,7 +78,7 @@ export function ChatInput({ value, onChange, onSend, placeholder = "اكتب ر�
         {/* Send Button */}
         <button
           type="submit"
-          disabled={!value.trim()}
+          disabled={!value.trim() || disabled}
           className="
             flex items-center justify-center w-10 h-10
             bg-primary text-white rounded-full 
