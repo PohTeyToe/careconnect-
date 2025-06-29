@@ -21,9 +21,16 @@ interface DoctorProfileProps {
   doctor: Doctor;
   onBack: () => void;
   onBookAppointment: () => void;
+  t: {
+    book: string;
+    contactInfo: string;
+    phone: string;
+    address: string;
+    hours: string;
+  };
 }
 
-export function DoctorProfile({ doctor, onBack, onBookAppointment }: DoctorProfileProps) {
+export function DoctorProfile({ doctor, onBack, onBookAppointment, t }: DoctorProfileProps) {
   return (
     <div className="flex flex-col h-screen bg-white max-w-md mx-auto">
       {/* Header with Back Arrow */}
@@ -40,8 +47,8 @@ export function DoctorProfile({ doctor, onBack, onBookAppointment }: DoctorProfi
         </div>
         
         <div className="flex-1">
-          <h1 className="text-white font-medium">الملف الشخصي للطبيب</h1>
-          <p className="text-white/80 text-sm">معلومات الطبيب التفصيلية</p>
+          <h1 className="text-white font-medium">{doctor.name}</h1>
+          <p className="text-white/80 text-sm">{doctor.specialty}</p>
         </div>
       </div>
 
@@ -75,14 +82,14 @@ export function DoctorProfile({ doctor, onBack, onBookAppointment }: DoctorProfi
 
           {/* Book Appointment CTA */}
           <div className="w-full">
-            <BookButton onClick={onBookAppointment} />
+            <BookButton onClick={onBookAppointment} label={t.book} />
           </div>
         </div>
 
         {/* Contact Information Section */}
         <div className="px-6 pb-8">
           <div className="bg-gray-50 rounded-2xl p-6 flex flex-col gap-6">
-            <h3 className="text-gray-900 mb-4 font-medium" dir="rtl">معلومات التواصل</h3>
+            <h3 className="text-gray-900 mb-4 font-medium" dir="rtl">{t.contactInfo}</h3>
             
             {/* Phone */}
             {doctor.phone && (
@@ -91,7 +98,7 @@ export function DoctorProfile({ doctor, onBack, onBookAppointment }: DoctorProfi
                   <Phone className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-500 text-sm mb-1" dir="rtl">الهاتف</p>
+                  <p className="text-gray-500 text-sm mb-1" dir="rtl">{t.phone}</p>
                   <p className="text-gray-900">{doctor.phone}</p>
                 </div>
               </div>
@@ -104,7 +111,7 @@ export function DoctorProfile({ doctor, onBack, onBookAppointment }: DoctorProfi
                   <MapPin className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-500 text-sm mb-1" dir="rtl">عنوان العيادة</p>
+                  <p className="text-gray-500 text-sm mb-1" dir="rtl">{t.address}</p>
                   <p className="text-gray-900 leading-relaxed">{doctor.address}</p>
                 </div>
               </div>
@@ -117,7 +124,7 @@ export function DoctorProfile({ doctor, onBack, onBookAppointment }: DoctorProfi
                   <Clock className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-500 text-sm mb-1" dir="rtl">ساعات العمل</p>
+                  <p className="text-gray-500 text-sm mb-1" dir="rtl">{t.hours}</p>
                   <p className="text-gray-900" dir="rtl">{doctor.hours}</p>
                 </div>
               </div>

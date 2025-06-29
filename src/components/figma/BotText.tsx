@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookButton } from './BookButton.tsx';
+import { useLanguage } from './LanguageContext.tsx';
 
 interface BotTextProps {
   content: string;
@@ -9,8 +10,12 @@ interface BotTextProps {
 }
 
 export function BotText({ content, timestamp, showBookingOption = false, onBookAppointment }: BotTextProps) {
+  const { translations, activeLanguage } = useLanguage();
+  const t = translations[activeLanguage] || translations.AR;
+
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('ar-SA', { 
+    const locale = activeLanguage === 'AR' ? 'ar-SA' : activeLanguage;
+    return date.toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit',
       hour12: false 
@@ -31,6 +36,7 @@ export function BotText({ content, timestamp, showBookingOption = false, onBookA
           <BookButton 
             onClick={onBookAppointment} 
             navigateToDoctors={true}
+            label={t.book}
           />
         )}
         

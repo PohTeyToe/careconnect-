@@ -3,6 +3,7 @@ import { ChatHeader } from './ChatHeader.tsx';
 import { UserText } from './UserText.tsx';
 import { BotText } from './BotText.tsx';
 import { ChatInput } from './ChatInput.tsx';
+import { useLanguage } from './LanguageContext.tsx';
 
 interface Message {
   id: string;
@@ -25,16 +26,19 @@ export function CareConnectFrame({
   onBookAppointment,
   className = ""
 }: CareConnectFrameProps) {
+  const { activeLanguage, translations } = useLanguage();
+  const t = translations[activeLanguage] || translations.AR;
+
   const defaultMessages: Message[] = [
     {
       id: '1',
-      content: 'صداع مستمر منذ يومين',
+      content: t.doctors,
       sender: 'user',
       timestamp: new Date(Date.now() - 300000)
     },
     {
       id: '2',
-      content: 'أفهم أنك تعاني من صداع مستمر منذ يومين. هذا قد يكون مؤشرًا على عدة أسباب مثل التوتر، قلة النوم، أو الجفاف. أنصحك بشرب الكثير من الماء، الحصول على قسط كافٍ من الراحة، وتجنب الضوء الساطع. إذا استمر الصداع أو ازداد سوءًا، يُرجى استشارة طبيب مختص.',
+      content: t.chooseDoctor,
       sender: 'bot',
       timestamp: new Date(Date.now() - 240000),
       showBookingOption: true
@@ -118,6 +122,7 @@ export function CareConnectFrame({
         value={inputValue}
         onChange={setInputValue}
         onSend={handleSendMessage}
+        placeholder={t.book}
       />
     </div>
   );

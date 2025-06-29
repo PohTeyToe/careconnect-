@@ -5,9 +5,10 @@ import { Calendar, Clock } from './Icons.tsx';
 interface BookButtonProps {
   onClick?: () => void;
   navigateToDoctors?: boolean;
+  label: string;
 }
 
-export function BookButton({ onClick, navigateToDoctors = false }: BookButtonProps) {
+export function BookButton({ onClick, navigateToDoctors = false, label }: BookButtonProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -34,7 +35,7 @@ export function BookButton({ onClick, navigateToDoctors = false }: BookButtonPro
     >
       <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
       <span className="font-medium">
-        {navigateToDoctors ? 'عرض الأطباء المتاحين' : 'احجز موعد مع طبيب'}
+        {label}
       </span>
       <Clock className="w-4 h-4 opacity-70" />
     </button>

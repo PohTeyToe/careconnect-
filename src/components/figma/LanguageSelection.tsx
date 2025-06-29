@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ArrowRight, MessageCircle, Users } from './Icons.tsx';
+import { Heart, MessageCircle, Users } from './Icons.tsx';
 import { LanguagePill } from './LanguagePill.tsx';
 
 interface Language {
@@ -23,13 +23,6 @@ const languages: Language[] = [
 
 export function LanguageSelection({ onLanguageSelected }: LanguageSelectionProps) {
   const navigate = useNavigate();
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
-
-  const handleContinue = () => {
-    if (selectedLanguage) {
-      onLanguageSelected(selectedLanguage);
-    }
-  };
 
   const handleChatClick = () => {
     navigate('/chat');
@@ -64,21 +57,11 @@ export function LanguageSelection({ onLanguageSelected }: LanguageSelectionProps
             flag={language.flag}
             code={language.code}
             name={language.name}
-            isSelected={selectedLanguage?.code === language.code}
-            onClick={() => setSelectedLanguage(language)}
+            isSelected={false}
+            onClick={() => onLanguageSelected(language)}
           />
         ))}
       </div>
-
-      {/* Continue Button */}
-      <button
-        onClick={handleContinue}
-        disabled={!selectedLanguage}
-        className={`continue-button ${selectedLanguage ? 'enabled' : ''}`}
-      >
-        <span>Continue</span>
-        <ArrowRight className="w-5 h-5" />
-      </button>
 
       {/* Quick Navigation Buttons */}
       <div className="flex gap-4 w-full mt-6">

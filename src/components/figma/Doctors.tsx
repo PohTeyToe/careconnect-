@@ -152,15 +152,7 @@ const translations = {
   }
 };
 
-export default function AppWrapper() {
-  return (
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>
-  );
-}
-
-function App() {
+export default function Doctors() {
   const navigate = useNavigate();
   const { activeLanguage, setActiveLanguage, translations } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');

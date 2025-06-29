@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LanguageSelection } from './LanguageSelection.tsx';
-import { CareConnectFrame } from './CareConnectFrame.tsx';
+import { useLanguage } from './LanguageContext.tsx';
 
 interface Language {
   code: string;
@@ -9,45 +10,18 @@ interface Language {
   locale: string;
 }
 
-export default function App() {
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
-  const [showChat, setShowChat] = useState(false);
+export default function LanguageSelect() {
+  const { setActiveLanguage } = useLanguage();
+  const navigate = useNavigate();
 
   const handleLanguageSelected = (language: Language) => {
-    setSelectedLanguage(language);
-    // Add a small delay for better UX
-    setTimeout(() => {
-      setShowChat(true);
-    }, 300);
+    setActiveLanguage(language.code);
+    navigate('/chat');
   };
 
-  const handleSendMessage = (message: string) => {
-    console.log(`Message sent in ${selectedLanguage?.name}:`, message);
-    // Add any custom message handling logic here
-  };
-
-  const handleBookAppointment = () => {
-    console.log(`Appointment booking requested in ${selectedLanguage?.name}`);
-    // Add any custom booking logic here
-  };
-
-  // Show onboarding screen if no language selected or chat not shown yet
-  if (!selectedLanguage || !showChat) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <LanguageSelection onLanguageSelected={handleLanguageSelected} />
-      </div>
-    );
-  }
-
-  // Show chat interface after language selection
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <CareConnectFrame
-        onSendMessage={handleSendMessage}
-        onBookAppointment={handleBookAppointment}
-        className="shadow-xl rounded-lg overflow-hidden"
-      />
+    <div className="min-h-screen bg-white">
+      <LanguageSelection onLanguageSelected={handleLanguageSelected} />
     </div>
   );
 }

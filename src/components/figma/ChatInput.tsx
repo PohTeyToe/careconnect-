@@ -5,9 +5,10 @@ interface ChatInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: (message: string) => void;
+  placeholder?: string;
 }
 
-export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
+export function ChatInput({ value, onChange, onSend, placeholder = "اكتب رسالتك هنا..." }: ChatInputProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSend(value);
@@ -44,7 +45,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="اكتب رسالتك هنا..."
+            placeholder={placeholder}
             className="
               w-full px-4 py-3 bg-white border border-gray-200 rounded-xl 
               resize-none overflow-hidden min-h-[48px] max-h-32

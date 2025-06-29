@@ -1,37 +1,41 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext.tsx';
 import { doctorData } from './Doctors.tsx';
 import { DoctorProfile } from './DoctorProfile.tsx';
 
 export default function DoctorDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { activeLanguage, translations } = useLanguage();
-  const t = translations[activeLanguage];
+  const t = translations[activeLanguage] || translations.AR;
 
-  // Get doctor translation
-  if (!id) return <div>{t.doctors} - {t.chooseDoctor}</div>;
-  
+  if (!id) return <div>Loading...</div>;
+
   const doctorTranslations = doctorData[id as keyof typeof doctorData];
-  const doctor = doctorTranslations ? {
+  
+  if (!doctorTranslations) {
+    return <div>Doctor not found</div>;
+  }
+
+  const doctor = {
     id,
-    name: doctorTranslations[activeLanguage].name,
-    specialty: doctorTranslations[activeLanguage].specialty,
-    city: doctorTranslations[activeLanguage].city,
+    name: doctorTranslations[activeLanguage as keyof typeof doctorTranslations].name,
+    specialty: doctorTranslations[activeLanguage as keyof typeof doctorTranslations].specialty,
+    city: doctorTranslations[activeLanguage as keyof typeof doctorTranslations].city,
     language: activeLanguage,
-    languages: ['العربية', 'English'], // Default languages, could be made dynamic
+    languages: [], // This should be populated from the base doctor data if needed
     phone: '+1 (416) 555-0123', // Mock data
     address: '123 Main St, Toronto, ON', // Mock data
-    hours: 'الاثنين - الجمعة: 9:00 ص - 5:00 م' // Mock data
-  } : null;
-
-  if (!doctor) return <div>{t.doctors} - {t.chooseDoctor}</div>;
+    hours: 'Monday - Friday: 9 AM - 5 PM' // Mock data
+  };
 
   return (
     <DoctorProfile
       doctor={doctor}
-      onBack={() => window.history.back()}
+      onBack={() => navigate(-1)}
       onBookAppointment={() => {}}
+      t={t}
     />
   );
 }

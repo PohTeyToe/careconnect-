@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from './LanguageContext.tsx';
 
 interface UserTextProps {
   content: string;
@@ -6,8 +7,11 @@ interface UserTextProps {
 }
 
 export function UserText({ content, timestamp }: UserTextProps) {
+  const { activeLanguage } = useLanguage();
+
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('ar-SA', { 
+    const locale = activeLanguage === 'AR' ? 'ar-SA' : activeLanguage;
+    return date.toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit',
       hour12: false 
